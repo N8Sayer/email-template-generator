@@ -4,3 +4,6 @@ body {
 main {
 	color: white;
 }
+.comment-toggle {
+	display: none;
+}

@@ -7,6 +7,32 @@ $(document).ready(function() {
 	});
 });
 
+function showComments() {
+	var comments = $('#commentToggle');
+	comments.removeClass('d-none');
+	comments.addClass('d-flex');
+}
+
+function toggleComments() {
+	if ($('.form-comments').length > 0) {
+		$('.form-comments').remove();
+	} else {
+		var form = $('#templateFields');
+		var formGroup = $(document.createElement('div')).addClass('form-group form-comments');
+		var label = $(document.createElement('label'))
+			.attr('for', 'formComments')
+			.html('Comments');
+		var formField = $(document.createElement('textarea'))
+			.attr('id', 'formComments')
+			.attr('name', 'formComments')
+			.addClass('form-control');
+		formGroup.append(label, formField);
+		$('.form-group')
+			.last()
+			.after(formGroup);
+	}
+}
+
 function addTemplates() {
 	var dropdown = $('#templateDropdown');
 	Object.keys(templates).forEach(function(key) {
@@ -15,6 +41,7 @@ function addTemplates() {
 			.attr('type', 'button')
 			.html(key);
 		button.click(function(e) {
+			showComments();
 			loadTemplate(this);
 		});
 		dropdown.append(button);
@@ -39,8 +66,7 @@ function loadTemplate(button) {
 		var text = $(document.createElement('textarea'))
 			.html(templates[template].text)
 			.css('width', '100%')
-			.attr('id', 'templateText')
-			.attr('rows', 10);
+			.attr({ id: 'templateText', rows: 10, disabled: true });
 		column.append(text);
 		$('.container').append(container);
 	}
@@ -56,10 +82,10 @@ function loadFields(template) {
 	fields.forEach(function(field, index) {
 		var formGroup = $(document.createElement('div')).addClass('form-group');
 		var label = $(document.createElement('label'))
-			.attr('for', `formField${index}`)
+			.attr('for', 'formField' + index)
 			.html(field.name);
 		var formField = $(document.createElement(field.type))
-			.attr('id', `formField${index}`)
+			.attr('id', 'formField' + index)
 			.attr('name', field.name)
 			.addClass('form-control');
 		if (field.type == 'select') {
@@ -73,7 +99,9 @@ function loadFields(template) {
 		formGroup.append(label, formField);
 		form.append(formGroup);
 	});
-	var btnGroup = $(document.createElement('div')).addClass('form-row d-flex justify-content-between');
+	var btnGroup = $(document.createElement('div')).addClass(
+		'form-row d-flex justify-content-between button-row'
+	);
 	var col1 = $(document.createElement('div')).addClass('col-auto');
 	var col2 = $(document.createElement('div')).addClass('col-auto');
 	var col3 = $(document.createElement('div')).addClass('col-auto');
@@ -99,9 +127,12 @@ function loadFields(template) {
 		.html('Copy to Clipboard')
 		.attr('id', 'clipboard');
 	clipboard.click(function(e) {
-		document.getElementById('templateText').select();
+		var templateText = document.getElementById('templateText');
+		$(templateText).attr({ disabled: false });
+		templateText.select();
 		document.execCommand('copy');
 		window.getSelection().removeAllRanges();
+		$(templateText).attr({ disabled: true });
 		var $notification = $('#notification');
 		$notification.html('Copied Template to Clipboard');
 		$notification
@@ -133,13 +164,19 @@ function updateTemplate(formFields) {
 	var template = templates[$('#templateLabel').html()];
 	var templateText = template.text;
 	var templateFields = template.fields;
-	templateFields.forEach(function(templateField) {
-		formFields.forEach(function(formField) {
-			if (templateField.name == formField.name) {
-				var regex = new RegExp(templateField.selector, 'g');
-				templateText = templateText.replace(regex, formField.value);
+	formFields.forEach(function(formField) {
+		var fieldSelector;
+		templateFields.forEach(function(tempField) {
+			if (tempField.name == formField.name) {
+				fieldSelector = tempField.selector;
 			}
 		});
+		if (formField.name == 'formComments') {
+			templateText += '\n\nComments:\n' + formField.value;
+		} else {
+			var regex = new RegExp(fieldSelector, 'g');
+			templateText = templateText.replace(regex, formField.value.trim());
+		}
 	});
 	$('#templateText').html(templateText);
 }

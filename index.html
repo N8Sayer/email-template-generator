@@ -14,8 +14,8 @@
           <h2 class='text-center display-4'>Email Template Generator</h2>
         </header>
       </div>
-      <div class='row mb-5'>
-        <article class='col-md-2 m-auto p-0'>
+      <div class='row mb-5 justify-content-center'>
+        <article class='d-flex col-md-3 justify-content-center'>
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Choose Your Template
@@ -23,6 +23,9 @@
             <div id='templateDropdown' class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             </div>
           </div>
+        </article>
+        <article id='commentToggle' class='d-none col-md-3 justify-content-center'>
+          <button class='btn btn-primary' type='button' onclick='toggleComments()'>Toggle Comment Section</button>
         </article>
       </div>
     </main>
