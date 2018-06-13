@@ -1,3 +1,4 @@
+var imgUrl = 'https://healient.com/wp-content/uploads/2014/07/hl1.png';
 var templates = {
 	Default: {
 		text: 'This is the default template.',
